@@ -29,10 +29,7 @@ def add_text_handler(message):
     message.text = message.text[5:]
     input_text = message.text
 
-    if dataBaseHandler.number_of_tasks((str(message.from_user.id))) == 0:
-        id = 1
-    else:
-        id = int(str(dataBaseHandler.number_of_tasks((str(message.from_user.id))))) + 1
+    id = int(str(dataBaseHandler.number_of_tasks((str(message.from_user.id))))) + 1
     new_task = (id, message.from_user.id, input_text, 'NULL')
     dataBaseHandler.add_elements(new_task)
     bot.send_message(message.from_user.id, 'Записано')
@@ -52,10 +49,7 @@ def photo_handler(message):
             src = (Path().absolute() / "photos" / filename).with_suffix(".jpg")
             with open(src, 'wb') as new_file:
                 new_file.write(downloaded_file)
-            if dataBaseHandler.number_of_tasks(str(message.from_user.id)) == 0:
-                id = 1
-            else:
-                id = int(str(dataBaseHandler.number_of_tasks(str(message.from_user.id)))) + 1
+            id = int(str(dataBaseHandler.number_of_tasks(str(message.from_user.id)))) + 1
             new_element = (id, message.from_user.id, message.caption[4:], str(src))
             dataBaseHandler.add_elements(new_element)
             bot.send_message(message.chat.id,'Данные успешно сохранены')
@@ -83,7 +77,7 @@ def show_all_handler(message):
     rows = dataBaseHandler.return_database(str(message.from_user.id))
     out = ''
     for row in rows:
-        out = str(row[0]) and " || " and str(row[1])
+        out = str(row[0]) + " || " + str(row[1])
         print(out)
         image_adress = row[2]
         if image_adress == 'NULL':
@@ -125,7 +119,14 @@ def user_id_handler(message):
 def delete_element_handler(message):
     delete_id = message.text[8:]
     idtask = (delete_id, message.from_user.id)
-    dataBaseHandler.delete_from_database(idtask)
+    file_path = Path(dataBaseHandler.photopath(idtask))
+    try:
+        file_path.unlink()
+    except OSError as e:
+        print("Ошибка: %s : %s" % (file_path, e.strerror))
+    dataBaseHandler.deltask(idtask)
+
+
 
 
 """ Запустим нашего бота """

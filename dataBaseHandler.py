@@ -55,10 +55,15 @@ def number_of_tasks(user):
     cursor = conn.cursor()
     cursor.execute(
         "SELECT COUNT(*) FROM TASKS WHERE ID_USER = ?", (user,))
-    conn.commit()
     return str(cursor.fetchone()[0])
 
-
+def photopath(taskid):
+    conn = sql.connect('telegramBotDatabase.db')
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT image FROM tasks WHERE id = ? AND id_user = ?", taskid)
+    path = str(cursor.fetchone()[0])
+    return path
 
 def clear_database():
     conn = sql.connect('telegramBotDatabase.db')
